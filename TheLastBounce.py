@@ -9,6 +9,37 @@ import random
 pygame.init()
 mixer.init()
 
+# Definisjoner
+
+# - Baner
+PATHS = {
+    "bgpic":    "./res/gif/picc.gif",
+    "rube":     "./res/gif/rube.gif",
+    "sword":    "./res/gif/sword.gif",
+    "count":    "./res/gif/count.wav",
+    "bounce":   "./res/wav/bounce.wav",
+    "ping":     "./res/wav/ping.wav",
+    "bgwav": [
+        "./res/wav/title.wav",
+        "./res/wav/hunt.wav",
+        "./res/wav/leg.wav",
+        "./res/wav/dark.wav",
+        "./res/wav/b.wav",
+    ],
+}
+
+# - Taster
+KEYS = {
+    "a_up":     ["w", "W"],
+    "a_down":   ["s", "S"],
+    "a_left":   ["a", "A"],
+    "a_right":  ["d", "D"],
+    "b_up":     ["i", "I"],
+    "b_down":   ["k", "K"],
+    "b_left":   ["j", "J"],
+    "b_right":  ["l", "L"],
+}
+
 # Definere poengsummer
 spillerA = 0
 spillerB = 0
@@ -25,9 +56,9 @@ wn.setup(width=800, height=600)
 wn.tracer(0)
 wn.title("Pong")
 wn.bgcolor("black")
-wn.bgpic("C:\\picc.gif")
-wn.addshape("C:\\rube.gif")
-wn.addshape("C:\\sverd.gif")
+wn.bgpic(PATHS['bgpic'])
+wn.addshape(PATHS['rube'])
+wn.addshape(PATHS['sword'])
 
 linje = turtle.Turtle()
 linje.speed(0)
@@ -43,7 +74,7 @@ linje.goto(0,275)
 # - Rekkert nr. 1
 paddle_a = turtle.Turtle()
 paddle_a.speed(0)
-paddle_a.shape("C:\\sverd.gif")
+paddle_a.shape(PATHS['sword'])
 paddle_a.penup()
 paddle_a.goto(-350,0)
 
@@ -51,14 +82,14 @@ paddle_a.goto(-350,0)
 # - Rekkert nr. 2
 paddle_b = turtle.Turtle()
 paddle_b.speed(0)
-paddle_b.shape("C:\\sverd.gif")
+paddle_b.shape(PATHS['sword'])
 paddle_b.penup()
 paddle_b.goto(350,0)
 
 
 # - Ball
 
-ball.shape("C:\\rube.gif")
+ball.shape(PATHS['rube'])
 ball.speed(0)
 ball.penup()
 ball.goto(0,0)
@@ -102,138 +133,108 @@ d = 3.3
 i = 2.3
 e = 1.1
 
-b = 35
-a = 12.5
+pad_dx = 12.5
+pad_dy = 35
+
 c = [1,-1]
 
 # Bevegelsesknapper
 
-def paddle_a_up():
-    
+def key_a_up():
     if paddle_a.ycor() == 280:
         return
+
     y = paddle_a.ycor()
-    y += b
+    y += pad_dy
     paddle_a.sety(y)
     
-def paddle_a_down():
-
+def key_a_down():
     if paddle_a.ycor() == -280:
         return
+
     y = paddle_a.ycor()
-    y -= b
+    y -= pad_dy
     paddle_a.sety(y)
     
-def paddle_a_Right():
-
+def key_a_right():
     if paddle_a.xcor() == -175:
         return
     
     x = paddle_a.xcor()
-    x += a
+    x += pad_dx
     paddle_a.setx(x)
 
-def paddle_a_Left():
-
+def key_a_left():
     if paddle_a.xcor() == -350:
         return
     
     x = paddle_a.xcor()
-    x -= a
+    x -= pad_dx
     paddle_a.setx(x)
     
-def paddle_b_up():
-
+def key_b_up():
     if paddle_b.ycor() == 280:
         return
+
     y = paddle_b.ycor()
-    y += b
+    y += pad_dy
     paddle_b.sety(y)
     
-def paddle_b_down():
-
+def key_b_down():
     if paddle_b.ycor() == -280:
         return
+
     y = paddle_b.ycor()
-    y -= b
+    y -= pad_dy
     paddle_b.sety(y)
 
-def paddle_b_Right():
-
+def key_b_right():
     if paddle_b.xcor() == 350:
         return
     
     x = paddle_b.xcor()
-    x += a
+    x += pad_dx
     paddle_b.setx(x)
 
-def paddle_b_Left():
-   
+def key_b_left():
     if paddle_b.xcor() == 175:
         return
     
     x = paddle_b.xcor()
-    x -= a
+    x -= pad_dx
     paddle_b.setx(x)
 
-wn.onkeypress(paddle_a_up, "w")
-wn.onkeypress(paddle_a_up, "W")
-wn.onkeypress(paddle_a_down, "s")
-wn.onkeypress(paddle_a_down, "S")
-wn.onkeypress(paddle_a_Right, "d")
-wn.onkeypress(paddle_a_Right, "D")
-wn.onkeypress(paddle_a_Left, "a")
-wn.onkeypress(paddle_a_Left, "A")
-wn.onkeypress(paddle_b_up, "i")
-wn.onkeypress(paddle_b_up, "I")
-wn.onkeypress(paddle_b_down, "k")
-wn.onkeypress(paddle_b_down, "K")
-wn.onkeypress(paddle_b_Right, "l")
-wn.onkeypress(paddle_b_Right, "L")
-wn.onkeypress(paddle_b_Left, "j")
-wn.onkeypress(paddle_b_Left, "J")
+
+for k in KEYS.keys():
+    # Hent funksjonen
+    fun = eval("key_%s" % k)
+
+    # Bind funksjonen til tastene definert ved 'KEYS'
+    wn.onkeypress(fun, KEYS[k][0])
+    wn.onkeypress(fun, KEYS[k][1])
+
+# Start å lytte
 wn.listen()
-
-# Nedtelling
-winsound.PlaySound(
-    "C:\\321.",
-    winsound.SND_ASYNC | winsound.SND_ALIAS
-    )
-time.sleep(0.8)
-
-start.write(3,align="center", font=('ARCADECLASSIC',50,'normal'))
-time.sleep(0.8)
-start.clear()
-start.write(2,align="center", font=('ARCADECLASSIC',50,'normal'))
-time.sleep(0.9)
-start.clear()
-start.write(1,align="center", font=('ARCADECLASSIC',50,'normal'))
-time.sleep(0.9)
-start.clear()
-start.write("GO",align="center", font=('ARCADECLASSIC',70,'normal'))
-time.sleep(1)
-start.clear()
 
 
 # Musikk-avsplling
-# - Asynkron avspilling
-
-musikk = [
-    "C:\\Title.wav",
-    "C:\\hunt.wav",
-    "C:\\leg.wav",
-    "C:\\dark.wav",
-    "C:\\b.wav",
-    ]
 
 # - Spilleliste
 current = []
 
-def play():
+# - Asynkron avspilling
+def playsnd(f):
+    winsound.PlaySound(f, winsound.SND_ASYNC | winsound.SND_ALIAS)
+
+def play_bg():
     global current
 
+    # Hopp over dersom det allerede avspilles musikk
+    if pygame.mixer.music.get_busy():
+        return
+
     if not current:
-        current = musikk[:]
+        current = PATHS['bgwav'][:]
         random.shuffle(current)
     
     song = current.pop()
@@ -241,23 +242,44 @@ def play():
     pygame.mixer.music.play()
 
 
+# ---- Hovedrutine ---- #
+
 string1 = "P1: {}"
 stringA = string1.ljust(len(string1) + 4)
 string2 = "P2: {}"
 stringB = string2.rjust(len(string2) + 4)
 stringC = stringA + stringB
 
+# - Nedtelling
+playsnd(PATHS['count'])
+time.sleep(0.8)
 
+start.write(3,align="center",font=('ARCADECLASSIC',50,'normal'))
+time.sleep(0.8)
+start.clear()
+start.write(2,align="center",font=('ARCADECLASSIC',50,'normal'))
+time.sleep(0.9)
+start.clear()
+start.write(1,align="center",font=('ARCADECLASSIC',50,'normal'))
+time.sleep(0.9)
+start.clear()
+start.write("GO",align="center",font=('ARCADECLASSIC',70,'normal'))
+time.sleep(1)
+start.clear()
+
+# - Hovedløkke
 while True:
     # Bytt musikk når det er mulig
-    if not pygame.mixer.music.get_busy():
-        play()
+    play_bg()
     
     # ---- RAMME START ---- #
 
     # Hent ballens posisjon
     p0 = [ball.xcor(),ball.ycor()]
     
+    # Primitiv kollisjonssporing
+    # TODO: Litt hjelp, takk...
+
     # - Når ballen treffer spillerens side
     if abs(p0[0]) >= 370:
         # Flytt ballen til midten
@@ -277,7 +299,7 @@ while True:
         ball.clear()
         pen.clear()
         pen.write(
-            stringC.format(spillerA, spillerB),
+            stringC.format(spillerA,spillerB),
             align="center",
             font=('ARCADECLASSIC',24,'normal')
             )
@@ -289,10 +311,7 @@ while True:
     # - Når ballen treffer taket eller gulvet
     if abs(p0[1]) >= 280:
         # Spill lyd
-        winsound.PlaySound(
-            "C:\\sound.wav",
-            winsound.SND_ASYNC | winsound.SND_ALIAS
-            )
+        playsnd(PATHS['bounce'])
         
         # Endre retning
         dx *= e
@@ -304,17 +323,12 @@ while True:
         else:
             p0[1] = -280
 
-    
     # - Når ballen treffer rekkert
-    #   TODO: Implementer kollisjondetektering
     pa = (paddle_a.xcor(),paddle_a.ycor())
     pb = (paddle_b.xcor(),paddle_b.ycor())
 
     if (pb[0] - 10 < p0[0] < pb[0] + 30) and (pb[1] - 50 < p0[1] < pb[1] + 70):
-        winsound.PlaySound(
-            "C:\\ping.wav",
-            winsound.SND_ASYNC | winsound.SND_ALIAS
-            )
+        playsnd(PATHS['ping'])
 
         ball.clear()
         p0[0] = pb[0] - 30
@@ -323,10 +337,7 @@ while True:
         dy = d * random.choice(c) + random.choice(ekstra)
 
     if (pa[0] - 30 < p0[0] < pa[0] + 10) and (pa[1] - 50 < p0[1] < pa[1] + 70):
-        winsound.PlaySound(
-            "C:\\ping.wav",
-            winsound.SND_ASYNC | winsound.SND_ALIAS
-            )
+        playsnd(PATHS['ping'])
 
         ball.clear()
         p0[0] = pa[0] + 30

@@ -81,9 +81,6 @@ pen.penup()
 pen.hideturtle()
 pen.goto(0,200)
 
-
-
-
 # cord_a = turtle.Turtle()
 # cord_a.speed(0)
 # cord_a.color = ("green")
@@ -212,9 +209,6 @@ wn.onkeypress(paddle_b_Right, "L")
 wn.onkeypress(paddle_b_Left, "J")
 # Hovedrutine
 
-
-
-
 winsound.PlaySound("C:\\321.",winsound.SND_ASYNC | winsound.SND_ALIAS)
 time.sleep(0.8)
 start.write(3,align="center", font=('ARCADECLASSIC',50,'normal'))
@@ -250,11 +244,6 @@ def play():
     pygame.mixer.music.load(song)
     pygame.mixer.music.play()
 
-
-      
-
-
- 
 c = [1,-1]
 
 engang = 0
@@ -266,10 +255,7 @@ while True:
         play()
     wn.update()
     time.sleep(delay)
-      
-    
-   
-   
+       
     # ---- RAMME START ---- #
     xb = ball.xcor()
     yb = ball.ycor()
@@ -357,8 +343,6 @@ while True:
     # if spillerA == 1:
     #     winsound.PlaySound(r"C:\Users\Keezy\Downloads\fatality.wav",winsound.SND_ASYNC | winsound.SND_ALIAS)
         
-    
-
     # - Bevege ballen
     ball.setx(xb + dx ) 
     ball.sety(yb + dy )

@@ -40,7 +40,6 @@ linje.width(width=3)
 linje.goto(0,275)
 
 
-
 # - Rekkert nr. 1
 paddle_a = turtle.Turtle()
 paddle_a.speed(0)
@@ -55,6 +54,7 @@ paddle_b.speed(0)
 paddle_b.shape("C:\\sverd.gif")
 paddle_b.penup()
 paddle_b.goto(350,0)
+
 
 # - Ball
 
@@ -177,26 +177,30 @@ def paddle_b_Left():
     paddle_b.setx(x)
 
 wn.onkeypress(paddle_a_up, "w")
-wn.onkeypress(paddle_a_down, "s")
-wn.onkeypress(paddle_a_Right, "d")
-wn.onkeypress(paddle_a_Left, "a")
-wn.onkeypress(paddle_b_up, "i")
-wn.onkeypress(paddle_b_down, "k")
-wn.onkeypress(paddle_b_Right, "l")
-wn.onkeypress(paddle_b_Left, "j")
 wn.onkeypress(paddle_a_up, "W")
+wn.onkeypress(paddle_a_down, "s")
 wn.onkeypress(paddle_a_down, "S")
+wn.onkeypress(paddle_a_Right, "d")
 wn.onkeypress(paddle_a_Right, "D")
+wn.onkeypress(paddle_a_Left, "a")
 wn.onkeypress(paddle_a_Left, "A")
+wn.onkeypress(paddle_b_up, "i")
 wn.onkeypress(paddle_b_up, "I")
+wn.onkeypress(paddle_b_down, "k")
 wn.onkeypress(paddle_b_down, "K")
+wn.onkeypress(paddle_b_Right, "l")
 wn.onkeypress(paddle_b_Right, "L")
+wn.onkeypress(paddle_b_Left, "j")
 wn.onkeypress(paddle_b_Left, "J")
 wn.listen()
 
 # Nedtelling
-winsound.PlaySound("C:\\321.",winsound.SND_ASYNC | winsound.SND_ALIAS)
+winsound.PlaySound(
+    "C:\\321.",
+    winsound.SND_ASYNC | winsound.SND_ALIAS
+    )
 time.sleep(0.8)
+
 start.write(3,align="center", font=('ARCADECLASSIC',50,'normal'))
 time.sleep(0.8)
 start.clear()
@@ -210,9 +214,10 @@ start.write("GO",align="center", font=('ARCADECLASSIC',70,'normal'))
 time.sleep(1)
 start.clear()
 
-# Musikk-avsplling
 
+# Musikk-avsplling
 # - Asynkron avspilling
+
 musikk = [
     "C:\\Title.wav",
     "C:\\hunt.wav",
@@ -235,11 +240,13 @@ def play():
     pygame.mixer.music.load(song)
     pygame.mixer.music.play()
 
+
 string1 = "P1: {}"
 stringA = string1.ljust(len(string1) + 4)
 string2 = "P2: {}"
 stringB = string2.rjust(len(string2) + 4)
 stringC = stringA + stringB
+
 
 while True:
     # Bytt musikk når det er mulig
@@ -249,7 +256,7 @@ while True:
     # ---- RAMME START ---- #
 
     # Hent ballens posisjon
-    p0 = (ball.xcor(),ball.ycor())
+    p0 = [ball.xcor(),ball.ycor()]
     
     # - Når ballen treffer spillerens side
     if abs(p0[0]) >= 370:
@@ -293,9 +300,9 @@ while True:
 
         # Avgrens ballen
         if p0[1] > 0:
-            ball.sety(280)
+            p0[1] = 280
         else:
-            ball.sety(-280)
+            p0[1] = -280
 
     
     # - Når ballen treffer rekkert
@@ -304,28 +311,28 @@ while True:
     pb = (paddle_b.xcor(),paddle_b.ycor())
 
     if (pb[0] - 10 < p0[0] < pb[0] + 30) and (pb[1] - 50 < p0[1] < pb[1] + 70):
-        ball.clear()
-        ball.setx(paddle_b.xcor()-30)
-
         winsound.PlaySound(
             "C:\\ping.wav",
             winsound.SND_ASYNC | winsound.SND_ALIAS
             )
 
-        dx = dx * 0 + d *-1 - random.choice(ekstra)
-        dy = dy * 0 + d * random.choice(c) + random.choice(ekstra)
-          
+        ball.clear()
+        p0[0] = pb[0] - 30
+
+        dx = -d - random.choice(ekstra)
+        dy = d * random.choice(c) + random.choice(ekstra)
+
     if (pa[0] - 30 < p0[0] < pa[0] + 10) and (pa[1] - 50 < p0[1] < pa[1] + 70):
-        ball.clear()
-        ball.setx(paddle_a.xcor()+30)
-
         winsound.PlaySound(
             "C:\\ping.wav",
             winsound.SND_ASYNC | winsound.SND_ALIAS
             )
 
-        dx = dx * 0 + d + random.choice(ekstra)
-        dy = dy * 0 + d * random.choice(c) + random.choice(ekstra)
+        ball.clear()
+        p0[0] = pa[0] + 30
+
+        dx = d + random.choice(ekstra)
+        dy = d * random.choice(c) + random.choice(ekstra)
 
     # - Bevege ballen
     ball.setx(p0[0] + dx) 

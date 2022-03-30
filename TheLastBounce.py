@@ -286,10 +286,6 @@ while True:
         ball.setx(0)
         ball.sety(0)
 
-        # Start med tilfeldig retning
-        dx = random.choice(c)
-        dy = random.choice(c)
-
         # Oppdater oversikt
         if p0[0] > 0:
             spillerA += 1
@@ -351,3 +347,4 @@ while True:
     
     wn.update()
     time.sleep(delay)
+    

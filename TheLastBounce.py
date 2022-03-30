@@ -1,13 +1,20 @@
+#!/usr/bin/env python3
+# -*- code: utf-8 -*-
 import turtle
 import time
-import winsound
 import pygame
 import os
+import sys
 from pygame import mixer
 import random
 
+# Miljø
 pygame.init()
 mixer.init()
+
+# - Lydkanaler: 1 musikk-kanal og 4 vilkårlige kanaler
+scm = pygame.mixer.music
+scl = [pygame.mixer.find_channel() for _ in range(4)]
 
 # Definisjoner
 
@@ -40,11 +47,13 @@ KEYS = {
     "b_right":  ["l", "L"],
 }
 
+# - Bildefrekvens
+DELAY = 1.67e-2
+
 # Definere poengsummer
 spillerA = 0
 spillerB = 0
 
-delay = 0.01
 
 # Objekter
 
@@ -88,7 +97,6 @@ paddle_b.goto(350,0)
 
 
 # - Ball
-
 ball.shape(PATHS['rube'])
 ball.speed(0)
 ball.penup()
@@ -125,10 +133,18 @@ start.hideturtle()
 start.goto(0,0)
 
 
+info = turtle.Turtle()
+info.ht()
+info.penup()
+info.goto(270,-270)
+info.color("#cd9575")
+info.speed(0)
+
+
 # Fysiske konstanter
 dx = 2.3
 dy = 2.3
-ekstra = [1.8,1.5,1,-0.5,0.9,-0.7]
+ekstra = [1.8,1.5,1,0.9,-0.5,-0.7]
 d = 3.3
 i = 2.3
 e = 1.1
@@ -224,7 +240,18 @@ current = []
 
 # - Asynkron avspilling
 def playsnd(f):
-    winsound.PlaySound(f, winsound.SND_ASYNC | winsound.SND_ALIAS)
+    if not os.path.exists(f):
+        return
+
+    s = mixer.Sound(f)
+
+    # Finn ledig kanal
+    for k in scl:
+        if not k.get_busy():
+            k.play(s)
+            break
+    else:
+        print(" W: Gikk tom for lydkanaler.", file=sys.stderr)
 
 def play_bg():
     global current
@@ -238,8 +265,10 @@ def play_bg():
         random.shuffle(current)
     
     song = current.pop()
-    pygame.mixer.music.load(song)
-    pygame.mixer.music.play()
+
+    if os.path.exists(song):
+        pygame.mixer.music.load(song)
+        pygame.mixer.music.play()
 
 
 # ---- Hovedrutine ---- #
@@ -268,11 +297,18 @@ time.sleep(1)
 start.clear()
 
 # - Hovedløkke
+
+m = ""
+
 while True:
+    # ---- RAMME START ---- #
+    t1 = time.time()
+
+    info.clear()
+    info.write(m,align="center")
+
     # Bytt musikk når det er mulig
     play_bg()
-    
-    # ---- RAMME START ---- #
 
     # Hent ballens posisjon
     p0 = [ball.xcor(),ball.ycor()]
@@ -285,6 +321,9 @@ while True:
         # Flytt ballen til midten
         ball.setx(0)
         ball.sety(0)
+
+        # Endre retning
+        dy *= -1
 
         # Oppdater oversikt
         if p0[0] > 0:
@@ -310,8 +349,8 @@ while True:
         playsnd(PATHS['bounce'])
         
         # Endre retning
-        dx *= e
-        dy *= -e
+        dx = (dx*e) if abs(dx*e) < 3.3 else dx
+        dy = (-dy*e) if abs(dy*e) < 3.3 else -dy
 
         # Avgrens ballen
         if p0[1] > 0:
@@ -320,6 +359,7 @@ while True:
             p0[1] = -280
 
     # - Når ballen treffer rekkert
+
     pa = (paddle_a.xcor(),paddle_a.ycor())
     pb = (paddle_b.xcor(),paddle_b.ycor())
 
@@ -345,6 +385,13 @@ while True:
     ball.setx(p0[0] + dx) 
     ball.sety(p0[1] + dy)
     
+    # Oppdater innhold
     wn.update()
-    time.sleep(delay)
-    
+
+    # Sett bildefrekvens til 1/DELAY
+    t2 = time.time()
+    s = DELAY-(t2-t1) if (t2-t1) < DELAY else 0.0
+    time.sleep(s)
+    t3 = time.time()
+
+    m = "FPS: %.2f (%.2f ms)  FT: %.2f ms" % (1/(t3-t1),1.0e3*(t3-t1),1.0e3*(t2-t1))

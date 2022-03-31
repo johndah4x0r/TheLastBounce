@@ -81,20 +81,6 @@ pen.penup()
 pen.hideturtle()
 pen.goto(0,200)
 
-# cord_a = turtle.Turtle()
-# cord_a.speed(0)
-# cord_a.color = ("green")
-# cord_a.penup()
-# cord_a.hideturtle()
-# cord_a.goto(-350,-200)
-
-# cord_b = turtle.Turtle()
-# cord_b.speed(0)
-# cord_b.color = ("green")
-# cord_b.penup()
-# cord_b.hideturtle()
-# cord_b.goto(350, -200)
-
 start = turtle.Turtle()
 start.speed(0)
 start.color("#cd9575")
@@ -111,7 +97,6 @@ ekstra = [1.8,1.5,1,-0.5,0.9,-0.7]
 d = 3.3
 i = 2.3
 e = 1.1
-##plus = random.choice([dx,dy])
 
 
 # Funksjoner
@@ -207,9 +192,11 @@ wn.onkeypress(paddle_b_up, "I")
 wn.onkeypress(paddle_b_down, "K")
 wn.onkeypress(paddle_b_Right, "L")
 wn.onkeypress(paddle_b_Left, "J")
+
+
 # Hovedrutine
 
-winsound.PlaySound("C:\\321.",winsound.SND_ASYNC | winsound.SND_ALIAS)
+winsound.PlaySound("C:\\321.wav",winsound.SND_ASYNC | winsound.SND_ALIAS)
 time.sleep(0.8)
 start.write(3,align="center", font=('ARCADECLASSIC',50,'normal'))
 time.sleep(0.8)
@@ -313,12 +300,6 @@ while True:
         dx *= e
         ball.sety(-280)
         
-##    if xb >= 380:
-##        pen.write("P1: {} - P2: {}".format(spillerA, spillerB),align="center", font=('ARCADECLASSIC',24,'normal'))
-##     
-##    if xb <= -380:
-##        pen.write("P1: {} - P2: {}".format(spillerA, spillerB),align="center", font=('ARCADECLASSIC',24,'normal'))
-        
         
     if (ball.xcor() > paddle_b.xcor()-10 and ball.xcor() < paddle_b.xcor()+30) and ball.ycor() < paddle_b. ycor()+70 and ball.ycor() > paddle_b.ycor()-50:
         ball.clear()
@@ -326,8 +307,6 @@ while True:
         winsound.PlaySound("C:\\ping.wav",winsound.SND_ASYNC | winsound.SND_ALIAS)
         dx = dx * 0 + d *-1 - random.choice(ekstra)
         dy = dy * 0 + d * random.choice(c) + random.choice(ekstra)
-##        plus += random.choice(ekstra)
-##        plus -= random.choice(ekstra)
         
           
     if (ball.xcor() < paddle_a.xcor()+10 and ball.xcor() > paddle_a.xcor()-30) and ball.ycor() < paddle_a. ycor()+70 and ball.ycor() > paddle_a.ycor()-50:
@@ -336,22 +315,9 @@ while True:
         winsound.PlaySound("C:\\ping.wav",winsound.SND_ASYNC | winsound.SND_ALIAS)
         dx = dx * 0 + d + random.choice(ekstra)
         dy = dy * 0 + d * random.choice(c) + random.choice(ekstra)
-##        plus += random.choice(ekstra)
-##        plus -= random.choice(ekstra)
-        
-        
-    # if spillerA == 1:
-    #     winsound.PlaySound(r"C:\Users\Keezy\Downloads\fatality.wav",winsound.SND_ASYNC | winsound.SND_ALIAS)
+
         
     # - Bevege ballen
-    ball.setx(xb + dx ) 
-    ball.sety(yb + dy )
+    ball.setx(xb + dx) 
+    ball.sety(yb + dy)
     
-
-    
-      
-          
-    
-          
-    
-     

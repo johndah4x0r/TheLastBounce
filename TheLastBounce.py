@@ -321,7 +321,7 @@ while True:
         ball.sety(0)
 
         # Endre retning
-        dy *= -1
+        (dx,dy) = (i*random.choice(c),i*random.choice(c))
 
         # Oppdater oversikt
         if p0[0] > 0:

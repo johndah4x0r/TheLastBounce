@@ -47,6 +47,13 @@ KEYS = {
     "a_right":  ["d", "D"],
 }
 
+CMDS = {
+    "b_up":     "UP",
+    "b_down":   "DOWN",
+    "b_left":   "LEFT",
+    "b_right":  "RIGHT",
+}
+
 # - Bildefrekvens
 DELAY = 1.67e-2
 
@@ -163,16 +170,19 @@ except:
 
 if mode == 1:
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.bind(('localhost', 8080))
+    addr = input("IP-adresse: ").strip()
+    sock.bind((addr, 8000))
     sock.listen(1)
 
     print("Venter på klient...")
     conn, client = sock.accept()
 
+    print("Klient tilkoblet:", client)
+
     xsoc = conn
 elif mode == 2:
     addr = input("Tjenerens adresse: ").strip()
-    xsoc = socket.create_connection((addr, 8080))
+    xsoc = socket.create_connection((addr, 8000))
 
 # Les fra nettsokkel helt til vi får nullmarkør
 def recv_asciiz():
@@ -189,11 +199,11 @@ def recv_asciiz():
             xsoc.close()
             sys.exit()
 
-    return buf
+    return str.from_bytes(buf, 'utf-8')
 
 # Send til nettsokkel
-def send_asciiz(buf):
-    xsoc.sendall(buf)
+def send_asciiz(m):
+    xsoc.sendall(bytes(m) + b'\x00')
 
 
 # Bevegelsesknapper
@@ -206,12 +216,16 @@ def key_a_up():
     y += pad_dy
     paddle_a.sety(y)
 
+    send_asciiz("UP")
+
 def key_a_down():
     if paddle_a.ycor() == -280:
         return
     y = paddle_a.ycor()
     y -= pad_dy
     paddle_a.sety(y)
+
+    send_asciiz("DOWN")
 
 def key_a_right():
     if paddle_a.xcor() == -175:
@@ -220,12 +234,16 @@ def key_a_right():
     x += pad_dx
     paddle_a.setx(x)
 
+    send_asciiz("RIGHT")
+
 def key_a_left():
     if paddle_a.xcor() == -350:
         return
     x = paddle_a.xcor()
     x -= pad_dx
     paddle_a.setx(x)
+
+    send_asciiz("LEFT")
 
 def key_b_up():
     if paddle_b.ycor() == 280:
@@ -305,9 +323,6 @@ def play_bg():
 
 
 # ---- Hovedrutine ---- #
-send_asciiz(b'DBG:Zdrave!')
-
-print("Mottatt melding:", recv_asciiz())
 
 string1 = "P1: {}"
 stringA = string1.ljust(len(string1) + 4)
@@ -339,6 +354,9 @@ m = ""
 while True:
     # ---- RAMME START ---- #
     t1 = time.time()
+
+    # Hent inn kommando
+    cmd = recv_asciiz()
 
     info.clear()
     info.write(m, align="center")
@@ -423,6 +441,9 @@ while True:
 
     # Oppdater innhold
     wn.update()
+
+    # Hold linja oppe
+    send_asciiz(b"NOP")
 
     # Sett bildefrekvens til 1/DELAY
     t2 = time.time()

@@ -351,6 +351,8 @@ start.clear()
 
 m = ""
 
+send_asciiz("NOP")
+
 while True:
     # ---- RAMME START ---- #
     t1 = time.time()
@@ -364,7 +366,7 @@ while True:
     else:
         f = CMDS[cmd]
         f()
-        
+
     info.clear()
     info.write(m, align="center")
 

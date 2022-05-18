@@ -358,6 +358,13 @@ while True:
     # Hent inn kommando
     cmd = recv_asciiz()
 
+    # Kjør kommando
+    if cmd == "NOP":
+        pass
+    else:
+        f = CMDS[cmd]
+        f()
+        
     info.clear()
     info.write(m, align="center")
 

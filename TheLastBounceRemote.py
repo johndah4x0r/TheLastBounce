@@ -48,10 +48,10 @@ KEYS = {
 }
 
 CMDS = {
-    "b_up":     "UP",
-    "b_down":   "DOWN",
-    "b_left":   "LEFT",
-    "b_right":  "RIGHT",
+    "UP":       "b_up",
+    "DOWN":     "b_down",
+    "LEFT":     "b_left",
+    "RIGHT":    "b_right",
 }
 
 # - Bildefrekvens

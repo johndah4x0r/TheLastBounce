@@ -364,8 +364,9 @@ while True:
     if cmd == "NOP":
         pass
     else:
-        f = CMDS[cmd]
+        f = eval("key_%s" % CMDS[cmd])
         f()
+
     info.clear()
     info.write(m, align="center")
 

@@ -451,7 +451,7 @@ while True:
     wn.update()
 
     # Hold linja oppe
-    send_asciiz(b"NOP")
+    send_asciiz("NOP")
 
     # Sett bildefrekvens til 1/DELAY
     t2 = time.time()

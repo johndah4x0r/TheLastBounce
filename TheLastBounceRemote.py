@@ -366,7 +366,6 @@ while True:
     else:
         f = CMDS[cmd]
         f()
-
     info.clear()
     info.write(m, align="center")
 

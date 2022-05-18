@@ -351,6 +351,8 @@ start.clear()
 
 m = ""
 
+x = 0
+
 send_asciiz("NOP")
 
 while True:
@@ -358,9 +360,9 @@ while True:
     t1 = time.time()
 
     # Hent inn kommando
-    cmd = recv_asciiz()
+    if x % 4 == 0:
+        cmd = recv_asciiz()
 
-    # Kjør kommando
     if cmd == "NOP":
         pass
     else:
@@ -453,6 +455,7 @@ while True:
 
     # Hold linja oppe
     send_asciiz("NOP")
+    cmd = "NOP"
 
     # Sett bildefrekvens til 1/DELAY
     t2 = time.time()
@@ -461,3 +464,5 @@ while True:
     t3 = time.time()
 
     m = "FPS: %.2f (%.2f ms)  FT: %.2f ms" % (1/(t3-t1), 1.0e3*(t3-t1), 1.0e3*(t2-t1))
+
+    x += 1

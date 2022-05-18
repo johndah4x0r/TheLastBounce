@@ -199,11 +199,11 @@ def recv_asciiz():
             xsoc.close()
             sys.exit()
 
-    return str.from_bytes(buf, 'utf-8')
+    return buf.decode('ascii')
 
 # Send til nettsokkel
 def send_asciiz(m):
-    xsoc.sendall(bytes(m) + b'\x00')
+    xsoc.sendall(bytes(m, 'ascii') + b'\x00')
 
 
 # Bevegelsesknapper
@@ -452,7 +452,7 @@ while True:
     wn.update()
 
     # Hold linja oppe
-    send_asciiz(b"NOP")
+    send_asciiz("NOP")
 
     # Sett bildefrekvens til 1/DELAY
     t2 = time.time()

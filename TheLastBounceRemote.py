@@ -50,12 +50,12 @@ KEYS = {
 CMDS = {
     "UP":       "b_up",
     "DOWN":     "b_down",
-    "LEFT":     "b_left",
-    "RIGHT":    "b_right",
+    "RIGHT":     "b_left",
+    "LEFT":    "b_right",
 }
 
 # - Løkkefrekvens
-DELAY = 4.67e-3
+DELAY = 1.67e-2
 
 # Definere poengsummer
 spillerA = 0
@@ -184,7 +184,7 @@ elif mode == 2:
     addr = input("Tjenerens adresse: ").strip()
     xsoc = socket.create_connection((addr, 8000))
 
-# Les fra nettsokkel helt til vi får nullmarkør
+# Les fra nettsokkel helt til vi mottar nullmarkør
 def recv_asciiz():
     buf = b""
     while True:
@@ -203,7 +203,11 @@ def recv_asciiz():
 
 # Send til nettsokkel
 def send_asciiz(m):
-    xsoc.sendall(bytes(m, 'ascii') + b'\x00')
+    try:
+        xsoc.sendall(bytes(m, 'ascii') + b'\x00')
+    except:
+        xsoc.close()
+        sys.exit()
 
 
 # Bevegelsesknapper
@@ -359,101 +363,100 @@ while True:
     # ---- RUTINE START ---- #
     t1 = time.time()
 
-    # Hent inn kommando
-    cmd = recv_asciiz()
+    # Bytt musikk når det er mulig
+    play_bg()
 
-    if cmd == "NOP":
-        pass
-    else:
+    # Hent ballens posisjon
+    p0 = [ball.xcor(), ball.ycor()]
+
+    # Primitiv kollisjonssporing
+    # TODO: Litt hjelp, takk...
+
+    # - Når ballen treffer spillerens side
+    if abs(p0[0]) >= 370:
+        # Flytt ballen til midten
+        ball.setx(0)
+        ball.sety(0)
+
+        # Endre retning
+        (dx, dy) = (i*random.choice(c), i*random.choice(c))
+
+        # Oppdater oversikt
+        if p0[0] > 0:
+            spillerA += 1
+        else:
+            spillerB += 1
+
+        ball.clear()
+        pen.clear()
+        pen.write(
+            stringC.format(spillerA, spillerB),
+            align="center",
+            font=('ARCADECLASSIC', 24, 'normal')
+            )
+
+        wn.update()
+        time.sleep(0.5)
+        continue
+
+    # - Når ballen treffer taket eller gulvet
+    if abs(p0[1]) >= 280:
+        # Spill lyd
+        playsnd(PATHS['bounce'])
+
+        # Endre retning
+        dx = (dx*e) if abs(dx*e) < 3.3 else dx
+        dy = (-dy*e) if abs(dy*e) < 3.3 else -dy
+
+        # Avgrens ballen
+        if p0[1] > 0:
+            p0[1] = 280
+        else:
+            p0[1] = -280
+
+    # - Når ballen treffer rekkert
+
+    pa = (paddle_a.xcor(), paddle_a.ycor())
+    pb = (paddle_b.xcor(), paddle_b.ycor())
+
+    if (pb[0] - 10 < p0[0] < pb[0] + 30) and (pb[1] - 50 < p0[1] < pb[1] + 70):
+        playsnd(PATHS['ping'])
+
+        ball.clear()
+        p0[0] = pb[0] - 30
+
+        dx = -d - random.choice(ekstra)
+        dy = d * random.choice(c) + random.choice(ekstra)
+
+    if (pa[0] - 30 < p0[0] < pa[0] + 10) and (pa[1] - 50 < p0[1] < pa[1] + 70):
+        playsnd(PATHS['ping'])
+
+        ball.clear()
+        p0[0] = pa[0] + 30
+
+        dx = d + random.choice(ekstra)
+        dy = d * random.choice(c) + random.choice(ekstra)
+
+    # - Bevege ballen
+    ball.setx(p0[0] + dx)
+    ball.sety(p0[1] + dy)
+
+    # Oppdater innhold
+    wn.update()
+
+    # Hent inn 15 ganger i sekundet
+    if ticks % 4 == 0:
+        cmd = "NOP"
+
+        # Hent inn kommando
+        while cmd == "NOP":
+            cmd = recv_asciiz()
+
         f = eval("key_%s" % CMDS[cmd])
         f()
 
-    # Ramme-rutiner
-    # - Kjøres hver 4. rotasjon
-    if x % 4 == 0:
-        # Bytt musikk når det er mulig
-        play_bg()
-
-        # Hent ballens posisjon
-        p0 = [ball.xcor(), ball.ycor()]
-
-        # Primitiv kollisjonssporing
-        # TODO: Litt hjelp, takk...
-
-        # - Når ballen treffer spillerens side
-        if abs(p0[0]) >= 370:
-            # Flytt ballen til midten
-            ball.setx(0)
-            ball.sety(0)
-
-            # Endre retning
-            (dx, dy) = (i*random.choice(c), i*random.choice(c))
-
-            # Oppdater oversikt
-            if p0[0] > 0:
-                spillerA += 1
-            else:
-                spillerB += 1
-
-            ball.clear()
-            pen.clear()
-            pen.write(
-                stringC.format(spillerA, spillerB),
-                align="center",
-                font=('ARCADECLASSIC', 24, 'normal')
-                )
-
-            wn.update()
-            time.sleep(0.5)
-            continue
-
-        # - Når ballen treffer taket eller gulvet
-        if abs(p0[1]) >= 280:
-            # Spill lyd
-            playsnd(PATHS['bounce'])
-
-            # Endre retning
-            dx = (dx*e) if abs(dx*e) < 3.3 else dx
-            dy = (-dy*e) if abs(dy*e) < 3.3 else -dy
-
-            # Avgrens ballen
-            if p0[1] > 0:
-                p0[1] = 280
-            else:
-                p0[1] = -280
-
-        # - Når ballen treffer rekkert
-
-        pa = (paddle_a.xcor(), paddle_a.ycor())
-        pb = (paddle_b.xcor(), paddle_b.ycor())
-
-        if (pb[0] - 10 < p0[0] < pb[0] + 30) and (pb[1] - 50 < p0[1] < pb[1] + 70):
-            playsnd(PATHS['ping'])
-
-            ball.clear()
-            p0[0] = pb[0] - 30
-
-            dx = -d - random.choice(ekstra)
-            dy = d * random.choice(c) + random.choice(ekstra)
-
-        if (pa[0] - 30 < p0[0] < pa[0] + 10) and (pa[1] - 50 < p0[1] < pa[1] + 70):
-            playsnd(PATHS['ping'])
-
-            ball.clear()
-            p0[0] = pa[0] + 30
-
-            dx = d + random.choice(ekstra)
-            dy = d * random.choice(c) + random.choice(ekstra)
-
-        # - Bevege ballen
-        ball.setx(p0[0] + dx)
-        ball.sety(p0[1] + dy)
-
-        # Oppdater innhold
-        wn.update()
-
-    # Hold linja oppe
-    send_asciiz("NOP")
+        # Hold linja oppe
+        send_asciiz("NOP")
 
     # Juster løkkefrekvensen
     t2 = time.time()
@@ -461,4 +464,4 @@ while True:
     time.sleep(s)
     t3 = time.time()
 
-    x += 1
+    ticks += 1

@@ -162,6 +162,8 @@ c = [1, -1]
 
 # ---- Fjerntilgang ---- #
 
+buf = []
+
 # Velg modus
 try:
     mode = int(input("Velg spillemodus [tjener: 1, klient: 2]: ").strip())
@@ -333,6 +335,7 @@ def handle_cmd():
     cmd, n = recv_asciiz()
 
     if n == 0 or cmd not in CMDS.keys():
+        buf.push(cmd)
         return
 
     f = eval("key_%s" % CMDS[cmd])
@@ -350,10 +353,11 @@ def sync_ball():
             dy))
         return
     elif mode == 2:
-        a, n = recv_asciiz()
+        a = buf.pop()
         s = a.split(":")
 
-        if n == 0 or s[0] != 'SYNC' or len(s) != 5:
+        if s[0] != 'SYNC' or len(s) != 5:
+            buf.push(a)
             return
 
         # Set coordinates
@@ -403,7 +407,7 @@ while True:
 
     if ticks % 8 == 0:
         sync_ball()
-        
+
     if ticks % 4 == 0:
         # Bytt musikk når det er mulig
         play_bg()

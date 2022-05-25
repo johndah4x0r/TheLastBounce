@@ -187,9 +187,20 @@ elif mode == 2:
 # - Sørg for at programmet ikke stopper opp
 xsoc.setblocking(0)
 
-# Les fra nettsokkel helt til vi mottar nullmarkør
+# Les ASCII fra nettsokkel
 def recv_asciiz():
     buf = b""
+
+    # - Nullmarkør i begynnelsen
+    try:
+        c = xsoc.recv(1)
+    except:
+        xsoc.close()
+        sys.exit()
+        
+    if c != b'\x00':
+        return None
+
     while True:
         # Les 1 byte om gangen
         try:
@@ -204,10 +215,10 @@ def recv_asciiz():
 
     return buf.decode('ascii')
 
-# Send til nettsokkel
+# Send ASCII til nettsokkel
 def send_asciiz(m):
     try:
-        xsoc.sendall(bytes(m, 'ascii') + b'\x00')
+        xsoc.sendall(b'\x00' + bytes(m, 'ascii') + b'\x00')
     except:
         xsoc.close()
         sys.exit()
@@ -449,7 +460,7 @@ while True:
     if ticks % 4 == 0:
         cmd = recv_asciiz()
 
-        if cmd != '':
+        if cmd != None:
             f = eval("key_%s" % CMDS[cmd])
             f()
 

@@ -361,10 +361,10 @@ def sync_ball():
             return
 
         # Set coordinates
-        ball.setx(int(s[1]))
+        ball.setx(-int(s[1]))
         ball.sety(int(s[2]))
 
-        # Set velocity vector, and reflect
+        # Set velocity vector
         dx = -float(s[3])
         dy = float(s[4])
 

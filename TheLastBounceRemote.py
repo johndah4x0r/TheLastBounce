@@ -191,37 +191,26 @@ xsoc.setblocking(0)
 def recv_asciiz():
     buf = b""
 
-    # - Nullmarkør i begynnelsen
     try:
-        c = xsoc.recv(1)
-    except:
-        xsoc.close()
-        sys.exit()
-        
-    if c != b'\x00':
-        return None
-
-    while True:
-        # Les 1 byte om gangen
-        try:
+        while True:
+            # Les 1 byte om gangen
             c = xsoc.recv(1)
-            if c != b'\x00':
-                buf += c
-            else:
+            if c == b'\x00':
                 break
-        except:
-            xsoc.close()
-            sys.exit()
 
-    return buf.decode('ascii')
+            buf += c
+    except Exception as e:
+        # - EAGAIN
+        if e.errno == 11:
+            pass
+        else:
+            raise e
+
+    return (buf.decode('ascii'), len(buf))
 
 # Send ASCII til nettsokkel
 def send_asciiz(m):
-    try:
-        xsoc.sendall(b'\x00' + bytes(m, 'ascii') + b'\x00')
-    except:
-        xsoc.close()
-        sys.exit()
+    xsoc.sendall(b'\x00' + bytes(m, 'ascii') + b'\x00')
 
 
 # Bevegelsesknapper
@@ -339,6 +328,15 @@ def play_bg():
         pygame.mixer.music.load(song)
         pygame.mixer.music.play()
 
+
+def handle_cmd():
+    cmd, n = recv_asciiz()
+
+    if n == 0 or cmd not in CMDS.keys:
+        return
+
+    f = eval("key_%s" % CMDS[cmd])
+    f()
 
 # ---- Hovedrutine ---- #
 
@@ -458,11 +456,7 @@ while True:
 
     # Hent inn 15 ganger i sekundet
     if ticks % 4 == 0:
-        cmd = recv_asciiz()
-
-        if cmd != None:
-            f = eval("key_%s" % CMDS[cmd])
-            f()
+        handle_cmd()
 
     # Juster løkkefrekvensen
     t2 = time.time()

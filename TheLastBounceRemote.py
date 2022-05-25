@@ -55,7 +55,7 @@ CMDS = {
 }
 
 # - Løkkefrekvens
-DELAY = 1.67e-2
+DELAY = 4.67e-3
 
 # Definere poengsummer
 spillerA = 0
@@ -201,7 +201,7 @@ def recv_asciiz():
             buf += c
     except Exception as e:
         # - EAGAIN
-        if e.errno == 11:
+        if e.errno == 11 or e.errno == 10035:
             pass
         else:
             raise e
@@ -332,7 +332,7 @@ def play_bg():
 def handle_cmd():
     cmd, n = recv_asciiz()
 
-    if n == 0 or cmd not in CMDS.keys:
+    if n == 0 or cmd not in CMDS.keys():
         return
 
     f = eval("key_%s" % CMDS[cmd])
@@ -373,90 +373,89 @@ while True:
     # ---- RUTINE START ---- #
     t1 = time.time()
 
-    # Bytt musikk når det er mulig
-    play_bg()
-
-    # Hent ballens posisjon
-    p0 = [ball.xcor(), ball.ycor()]
-
-    # Primitiv kollisjonssporing
-    # TODO: Litt hjelp, takk...
-
-    # - Når ballen treffer spillerens side
-    if abs(p0[0]) >= 370:
-        # Flytt ballen til midten
-        ball.setx(0)
-        ball.sety(0)
-
-        # Endre retning
-        (dx, dy) = (i*random.choice(c), i*random.choice(c))
-
-        # Oppdater oversikt
-        if p0[0] > 0:
-            spillerA += 1
-        else:
-            spillerB += 1
-
-        ball.clear()
-        pen.clear()
-        pen.write(
-            stringC.format(spillerA, spillerB),
-            align="center",
-            font=('ARCADECLASSIC', 24, 'normal')
-            )
-
-        wn.update()
-        time.sleep(0.5)
-        continue
-
-    # - Når ballen treffer taket eller gulvet
-    if abs(p0[1]) >= 280:
-        # Spill lyd
-        playsnd(PATHS['bounce'])
-
-        # Endre retning
-        dx = (dx*e) if abs(dx*e) < 3.3 else dx
-        dy = (-dy*e) if abs(dy*e) < 3.3 else -dy
-
-        # Avgrens ballen
-        if p0[1] > 0:
-            p0[1] = 280
-        else:
-            p0[1] = -280
-
-    # - Når ballen treffer rekkert
-
-    pa = (paddle_a.xcor(), paddle_a.ycor())
-    pb = (paddle_b.xcor(), paddle_b.ycor())
-
-    if (pb[0] - 10 < p0[0] < pb[0] + 30) and (pb[1] - 50 < p0[1] < pb[1] + 70):
-        playsnd(PATHS['ping'])
-
-        ball.clear()
-        p0[0] = pb[0] - 30
-
-        dx = -d - random.choice(ekstra)
-        dy = d * random.choice(c) + random.choice(ekstra)
-
-    if (pa[0] - 30 < p0[0] < pa[0] + 10) and (pa[1] - 50 < p0[1] < pa[1] + 70):
-        playsnd(PATHS['ping'])
-
-        ball.clear()
-        p0[0] = pa[0] + 30
-
-        dx = d + random.choice(ekstra)
-        dy = d * random.choice(c) + random.choice(ekstra)
-
-    # - Bevege ballen
-    ball.setx(p0[0] + dx)
-    ball.sety(p0[1] + dy)
-
-    # Oppdater innhold
-    wn.update()
-
-    # Hent inn 15 ganger i sekundet
+    handle_cmd()
+    
     if ticks % 4 == 0:
-        handle_cmd()
+        # Bytt musikk når det er mulig
+        play_bg()
+
+        # Hent ballens posisjon
+        p0 = [ball.xcor(), ball.ycor()]
+
+        # Primitiv kollisjonssporing
+        # TODO: Litt hjelp, takk...
+
+        # - Når ballen treffer spillerens side
+        if abs(p0[0]) >= 370:
+            # Flytt ballen til midten
+            ball.setx(0)
+            ball.sety(0)
+
+            # Endre retning
+            (dx, dy) = (i*random.choice(c), i*random.choice(c))
+
+            # Oppdater oversikt
+            if p0[0] > 0:
+                spillerA += 1
+            else:
+                spillerB += 1
+
+            ball.clear()
+            pen.clear()
+            pen.write(
+                stringC.format(spillerA, spillerB),
+                align="center",
+                font=('ARCADECLASSIC', 24, 'normal')
+                )
+
+            wn.update()
+            time.sleep(0.5)
+            continue
+
+        # - Når ballen treffer taket eller gulvet
+        if abs(p0[1]) >= 280:
+            # Spill lyd
+            playsnd(PATHS['bounce'])
+
+            # Endre retning
+            dx = (dx*e) if abs(dx*e) < 3.3 else dx
+            dy = (-dy*e) if abs(dy*e) < 3.3 else -dy
+
+            # Avgrens ballen
+            if p0[1] > 0:
+                p0[1] = 280
+            else:
+                p0[1] = -280
+
+        # - Når ballen treffer rekkert
+
+        pa = (paddle_a.xcor(), paddle_a.ycor())
+        pb = (paddle_b.xcor(), paddle_b.ycor())
+
+        if (pb[0] - 10 < p0[0] < pb[0] + 30) and (pb[1] - 50 < p0[1] < pb[1] + 70):
+            playsnd(PATHS['ping'])
+
+            ball.clear()
+            p0[0] = pb[0] - 30
+
+            dx = -d - random.choice(ekstra)
+            dy = d * random.choice(c) + random.choice(ekstra)
+
+        if (pa[0] - 30 < p0[0] < pa[0] + 10) and (pa[1] - 50 < p0[1] < pa[1] + 70):
+            playsnd(PATHS['ping'])
+
+            ball.clear()
+            p0[0] = pa[0] + 30
+
+            dx = d + random.choice(ekstra)
+            dy = d * random.choice(c) + random.choice(ekstra)
+
+        # - Bevege ballen
+        ball.setx(p0[0] + dx)
+        ball.sety(p0[1] + dy)
+
+        # Oppdater innhold
+        wn.update()
 
     # Juster løkkefrekvensen
     t2 = time.time()

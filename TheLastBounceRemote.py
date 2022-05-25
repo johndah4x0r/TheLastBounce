@@ -355,7 +355,7 @@ start.clear()
 
 m = ""
 
-x = 0
+ticks = 0
 
 send_asciiz("NOP")
 

@@ -335,7 +335,7 @@ def handle_cmd():
     cmd, n = recv_asciiz()
 
     if n == 0 or cmd not in CMDS.keys():
-        buf.push(cmd)
+        buf.append(cmd)
         return
 
     f = eval("key_%s" % CMDS[cmd])
@@ -357,7 +357,7 @@ def sync_ball():
         s = a.split(":")
 
         if s[0] != 'SYNC' or len(s) != 5:
-            buf.push(a)
+            buf.append(a)
             return
 
         # Set coordinates

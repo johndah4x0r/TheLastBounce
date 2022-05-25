@@ -446,14 +446,11 @@ while True:
 
     # Hent inn 15 ganger i sekundet
     if ticks % 4 == 0:
-        cmd = "NOP"
+        cmd = recv_asciiz()
 
-        # Hent inn kommando
-        while cmd == "NOP":
-            cmd = recv_asciiz()
-
-        f = eval("key_%s" % CMDS[cmd])
-        f()
+        if cmd != "NOP":
+            f = eval("key_%s" % CMDS[cmd])
+            f()
 
         # Hold linja oppe
         send_asciiz("NOP")

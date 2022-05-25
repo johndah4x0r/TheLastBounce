@@ -338,6 +338,32 @@ def handle_cmd():
     f = eval("key_%s" % CMDS[cmd])
     f()
 
+def sync_ball():
+    global ball, dx, dy
+
+    # Kun klient skal synkroniseres
+    if mode == 1:
+        send_asciiz("SYNC:%d:%d:%.2f:%.2f" % (
+            ball.xcor(),
+            ball.ycor(),
+            dx,
+            dy))
+        return
+    elif mode == 2:
+        a, n = recv_asciiz()
+        s = a.split(":")
+
+        if n == 0 or s[0] != 'SYNC' or len(s) != 5:
+            return
+
+        # Set coordinates
+        ball.setx(s[1])
+        ball.sety(s[2])
+
+        # Set velocity vector, and reflect
+        dx = -s[3]
+        dy = s[4]
+
 # ---- Hovedrutine ---- #
 
 string1 = "P1: {}"
@@ -374,7 +400,10 @@ while True:
     t1 = time.time()
 
     handle_cmd()
-    
+
+    if ticks % 8 == 0:
+        sync_ball()
+        
     if ticks % 4 == 0:
         # Bytt musikk når det er mulig
         play_bg()

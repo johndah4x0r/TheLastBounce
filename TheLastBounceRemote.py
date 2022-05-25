@@ -335,7 +335,7 @@ def handle_cmd():
     cmd, n = recv_asciiz()
 
     if n == 0 or cmd not in CMDS.keys():
-        buf.push(cmd)
+        buf.append(cmd)
         return
 
     f = eval("key_%s" % CMDS[cmd])
@@ -357,16 +357,16 @@ def sync_ball():
         s = a.split(":")
 
         if s[0] != 'SYNC' or len(s) != 5:
-            buf.push(a)
+            buf.append(a)
             return
 
         # Set coordinates
-        ball.setx(s[1])
-        ball.sety(s[2])
+        ball.setx(int(s[1]))
+        ball.sety(int(s[2]))
 
         # Set velocity vector, and reflect
-        dx = -s[3]
-        dy = s[4]
+        dx = -float(s[3])
+        dy = float(s[4])
 
 # ---- Hovedrutine ---- #
 

@@ -184,6 +184,9 @@ elif mode == 2:
     addr = input("Tjenerens adresse: ").strip()
     xsoc = socket.create_connection((addr, 8000))
 
+# - Sørg for at programmet ikke stopper opp
+xsoc.setblocking(0)
+
 # Les fra nettsokkel helt til vi mottar nullmarkør
 def recv_asciiz():
     buf = b""
@@ -357,8 +360,6 @@ m = ""
 
 ticks = 0
 
-send_asciiz("NOP")
-
 while True:
     # ---- RUTINE START ---- #
     t1 = time.time()
@@ -448,12 +449,9 @@ while True:
     if ticks % 4 == 0:
         cmd = recv_asciiz()
 
-        if cmd != "NOP":
+        if cmd != '':
             f = eval("key_%s" % CMDS[cmd])
             f()
-
-        # Hold linja oppe
-        send_asciiz("NOP")
 
     # Juster løkkefrekvensen
     t2 = time.time()

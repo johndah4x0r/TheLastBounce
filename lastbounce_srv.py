@@ -1,4 +1,4 @@
-from http.server import BaseHTTPRequestHandler,HTTPServer
+from http.server import BaseHTTPRequestHandler, HTTPServer
 import time
 
 DEBUG = True
@@ -6,12 +6,14 @@ DEBUG = True
 hostName = "localhost"
 serverPort = 8000
 
+
 def _game(info):
     if DEBUG:
         for i in info:
             x = i.split("=")
             print("  > '%s': %s" % (x[0], x[1]))
     pass
+
 
 class MyServer(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -27,7 +29,7 @@ class MyServer(BaseHTTPRequestHandler):
                 self.send_header("Connection", "close")
                 self.end_headers()
                 return
-            
+
             info = path.split("&")[1:]
             _game(info)
 
@@ -37,11 +39,11 @@ class MyServer(BaseHTTPRequestHandler):
             self.end_headers()
 
             res = "HELLO THERE\r\n"
-            self.wfile.write(bytes(res, 'utf-8'))
-            
+            self.wfile.write(bytes(res, "utf-8"))
+
         elif "GET /" in req:
             self.send_response(200)
-            self.send_header("Content-type","text/html")
+            self.send_header("Content-type", "text/html")
             self.end_headers()
 
             f = open("index.html", "rb")
@@ -50,11 +52,11 @@ class MyServer(BaseHTTPRequestHandler):
 
         else:
             self.send_response(404)
-            self.send_header("Connection","close")
+            self.send_header("Connection", "close")
             self.end_headers()
 
 
-websrv = HTTPServer((hostName, serverPort),MyServer)
+websrv = HTTPServer((hostName, serverPort), MyServer)
 
 try:
     websrv.serve_forever()
@@ -65,6 +67,3 @@ except KeyboardInterrupt:
 
 finally:
     websrv.server_close()
-    
-            
-
